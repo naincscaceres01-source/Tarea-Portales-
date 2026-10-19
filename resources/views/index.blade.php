@@ -37,12 +37,11 @@
 </head>
 <body>
 
-    <!-- NAVBAR (Menú de navegación) -->
     <nav class="navbar is-dark-blue" role="navigation" aria-label="main navigation">
         <div class="container">
             <div class="navbar-brand">
                 <a class="navbar-item has-text-weight-bold is-size-4 text-gold" href="#">
-                    🏨 Hotel Paraíso Real
+                    Hotel Paraíso Real
                 </a>
             </div>
 
@@ -114,7 +113,6 @@
                     </div>
                 </div>
 
-                <!-- Habitación Familiar -->
                 <div class="column is-3">
                     <div class="card" style="height: 100%;">
                         <div class="card-image">
@@ -189,7 +187,6 @@
         </div>
     </section>
 
-    <!-- GALERÍA -->
     <section id="galeria" class="section">
         <div class="container">
             <h2 class="title is-2 has-text-centered mb-6" style="color: var(--primary-blue);">Galería de Instalaciones</h2>
