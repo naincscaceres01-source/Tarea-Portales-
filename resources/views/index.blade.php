@@ -16,7 +16,8 @@
         }
         body {
             background-color: var(--beige-bg);
-            font-family: sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: var(--primary-blue);
         }
         .hero-hotel {
             background: linear-gradient(rgba(15, 37, 55, 0.75), rgba(15, 37, 55, 0.75)), 
@@ -32,6 +33,16 @@
         }
         .text-gold {
             color: var(--gold-accent) !important;
+        }
+        
+        /* Asegura que los textos descriptivos sobre cada campo del formulario sean azul oscuro */
+        label.label {
+            color: var(--primary-blue) !important;
+            font-weight: 600;
+        }
+
+        #servicios p, #servicios h3 {
+            color: var(--primary-blue) !important;
         }
     </style>
 </head>
@@ -53,6 +64,7 @@
                     <a class="navbar-item has-text-white" href="#galeria">Galería</a>
                     <a class="navbar-item has-text-white" href="#reservas">Reservas</a>
                     <a class="navbar-item has-text-white" href="#contacto">Contacto</a>
+                    <a class="navbar-item button is-gold is-small mt-2 ml-3" href="/admin" target="_blank">Panel Admin</a>
                 </div>
             </div>
         </div>
@@ -62,7 +74,7 @@
         <div class="hero-body has-text-centered">
             <div class="container">
                 <h1 class="title is-1 has-text-white">Tu descanso comienza aquí</h1>
-                <p class="subtitle is-4 has-text-light mt-2">Elegancia, lujo y tranquilidad en un solo lugar.</p>
+                <p class="subtitle is-4 has-text-light mt-2">Elegancia, confort y exclusividad en un solo lugar.</p>
                 <a href="#habitaciones" class="button is-gold is-medium has-text-weight-bold mt-4">
                     Consultar habitaciones
                 </a>
@@ -70,118 +82,92 @@
         </div>
     </section>
 
+    @if(session('success'))
+        <div class="container mt-5">
+            <div class="notification is-success has-text-centered">
+                <button class="delete" onclick="this.parentElement.style.display='none';"></button>
+                {{ session('success') }}
+            </div>
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="container mt-5">
+            <div class="notification is-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
+
     <section id="habitaciones" class="section">
         <div class="container">
             <h2 class="title is-2 has-text-centered mb-6" style="color: var(--primary-blue);">Nuestras Habitaciones</h2>
             
             <div class="columns is-multiline">
-                <div class="column is-3">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-image">
-                            <figure class="image is-4by3">
-                                <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=500&q=80" alt="Habitación Sencilla">
-                            </figure>
-                        </div>
-                        <div class="card-content">
-                            <p class="title is-5 mb-1">Habitación Sencilla</p>
-                            <p class="subtitle is-6 has-text-grey mb-3"><i class="fas fa-user"></i> Capacidad: 1 persona</p>
-                            <div class="content">
-                                Confortable espacio equipado con cama individual, Wi-Fi de alta velocidad y escritorio.
-                                <p class="title is-5 text-gold mt-2">$80.00 <span class="is-size-7 has-text-grey">/ noche</span></p>
+                @forelse($habitaciones as $item)
+                    <div class="column is-3">
+                        <div class="card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                            <div>
+                                <div class="card-image">
+                                    <figure class="image is-4by3">
+                                        <img src="{{ $item->imagen }}" alt="{{ $item->nombre }}">
+                                    </figure>
+                                </div>
+                                <div class="card-content">
+                                    <p class="title is-5 mb-1">{{ $item->nombre }}</p>
+                                    <p class="subtitle is-6 mb-3"><i class="fas fa-users"></i> {{ $item->capacidad }}</p>
+                                    <div class="content">
+                                        <p>{{ $item->descripcion }}</p>
+                                        <p class="title is-5 text-gold mt-2">${{ number_format($item->precio, 2) }} <span class="is-size-7" style="color: #666;">/ noche</span></p>
+                                    </div>
+                                </div>
                             </div>
-                            <a href="#reservas" class="button is-dark-blue is-fullwidth">Reservar</a>
+                            <div class="p-4 pt-0">
+                                <a href="#reservas" class="button is-dark-blue is-fullwidth">Reservar Ahora</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="column is-3">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-image">
-                            <figure class="image is-4by3">
-                                <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=500&q=80" alt="Habitación Doble">
-                            </figure>
-                        </div>
-                        <div class="card-content">
-                            <p class="title is-5 mb-1">Habitación Doble</p>
-                            <p class="subtitle is-6 has-text-grey mb-3"><i class="fas fa-users"></i> Capacidad: 2 personas</p>
-                            <div class="content">
-                                Espaciosa habitación con cama Queen, baño privado, minibar y vista panorámica.
-                                <p class="title is-5 text-gold mt-2">$120.00 <span class="is-size-7 has-text-grey">/ noche</span></p>
-                            </div>
-                            <a href="#reservas" class="button is-dark-blue is-fullwidth">Reservar</a>
-                        </div>
+                @empty
+                    <div class="column is-12 has-text-centered">
+                        <p class="is-size-5" style="color: var(--primary-blue);">No hay habitaciones registradas o disponibles por el momento.</p>
                     </div>
-                </div>
-
-                <div class="column is-3">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-image">
-                            <figure class="image is-4by3">
-                                <img src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=500&q=80" alt="Habitación Familiar">
-                            </figure>
-                        </div>
-                        <div class="card-content">
-                            <p class="title is-5 mb-1">Habitación Familiar</p>
-                            <p class="subtitle is-6 has-text-grey mb-3"><i class="fas fa-users"></i> Capacidad: 4 personas</p>
-                            <div class="content">
-                                Dos camas matrimoniales, área de estar, Smart TV y todas las comodidades para la familia.
-                                <p class="title is-5 text-gold mt-2">$180.00 <span class="is-size-7 has-text-grey">/ noche</span></p>
-                            </div>
-                            <a href="#reservas" class="button is-dark-blue is-fullwidth">Reservar</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="column is-3">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-image">
-                            <figure class="image is-4by3">
-                                <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=500&q=80" alt="Suite Presidencial">
-                            </figure>
-                        </div>
-                        <div class="card-content">
-                            <p class="title is-5 mb-1">Suite Presidencial</p>
-                            <p class="subtitle is-6 has-text-grey mb-3"><i class="fas fa-crown"></i> Capacidad: 2 personas</p>
-                            <div class="content">
-                                Máximo lujo con jacuzzi privado, balcón, cama King Size y atención personalizada.
-                                <p class="title is-5 text-gold mt-2">$250.00 <span class="is-size-7 has-text-grey">/ noche</span></p>
-                            </div>
-                            <a href="#reservas" class="button is-dark-blue is-fullwidth">Reservar</a>
-                        </div>
-                    </div>
-                </div>
+                @endforelse
             </div>
         </div>
     </section>
 
     <section id="servicios" class="section has-background-white">
         <div class="container">
-            <h2 class="title is-2 has-text-centered mb-6" style="color: var(--primary-blue);">Servicios del Hotel</h2>
+            <h2 class="title is-2 has-text-centered mb-6" style="color: var(--primary-blue);">Nuestros Servicios</h2>
             <div class="columns has-text-centered">
                 <div class="column">
                     <i class="fas fa-wifi fa-3x text-gold mb-3"></i>
                     <h3 class="title is-5">Wi-Fi de Alta Velocidad</h3>
-                    <p>Acceso a internet en habitaciones y áreas comunes.</p>
+                    <p>Acceso a internet inalámbrico en habitaciones y áreas comunes.</p>
                 </div>
                 <div class="column">
                     <i class="fas fa-parking fa-3x text-gold mb-3"></i>
                     <h3 class="title is-5">Estacionamiento</h3>
-                    <p>Parqueo privado y seguro 24/7 para nuestros huéspedes.</p>
+                    <p>Parqueo privado con vigilancia y monitoreo las 24 horas.</p>
                 </div>
                 <div class="column">
                     <i class="fas fa-utensils fa-3x text-gold mb-3"></i>
-                    <h3 class="title is-5">Restaurante</h3>
+                    <h3 class="title is-5">Restaurante Gourmet</h3>
                     <p>Gastronomía nacional e internacional a la carta.</p>
                 </div>
                 <div class="column">
                     <i class="fas fa-swimming-pool fa-3x text-gold mb-3"></i>
                     <h3 class="title is-5">Piscina & Bar</h3>
-                    <p>Área de relajación al aire libre con coctelería.</p>
+                    <p>Piscina al aire libre con barra de coctelería y bebidas.</p>
                 </div>
                 <div class="column">
                     <i class="fas fa-concierge-bell fa-3x text-gold mb-3"></i>
                     <h3 class="title is-5">Servicio a la Habitación</h3>
-                    <p>Atención disponible durante todo el día.</p>
+                    <p>Atención personalizada y pedidos directamente a tu puerta.</p>
                 </div>
             </div>
         </div>
@@ -215,21 +201,30 @@
             <div class="box p-6" style="background-color: #ffffff; border-top: 4px solid var(--gold-accent);">
                 <h2 class="title is-3 has-text-centered mb-5" style="color: var(--primary-blue);">Formulario de Reserva</h2>
                 
-                <form action="#" method="GET" onsubmit="event.preventDefault(); alert('¡Solicitud enviada correctamente!');">
+                <form action="{{ route('reservar') }}" method="POST">
+                    @csrf
                     <div class="columns">
-                        <div class="column is-6">
+                        <div class="column is-4">
                             <div class="field">
-                                <label class="label">Fecha de Entrada</label>
+                                <label class="label">Nombre Completo</label>
                                 <div class="control">
-                                    <input class="input" type="date" required>
+                                    <input class="input" type="text" name="nombre_cliente" required placeholder="Ej. Axel Galo">
                                 </div>
                             </div>
                         </div>
-                        <div class="column is-6">
+                        <div class="column is-4">
                             <div class="field">
-                                <label class="label">Fecha de Salida</label>
+                                <label class="label">Correo Electrónico</label>
                                 <div class="control">
-                                    <input class="input" type="date" required>
+                                    <input class="input" type="email" name="correo_cliente" required placeholder="reservas@paraisoreal.example">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column is-4">
+                            <div class="field">
+                                <label class="label">Teléfono</label>
+                                <div class="control">
+                                    <input class="input" type="text" name="telefono_cliente" required placeholder="+504 9999-1004">
                                 </div>
                             </div>
                         </div>
@@ -238,13 +233,31 @@
                     <div class="columns">
                         <div class="column is-6">
                             <div class="field">
-                                <label class="label">Tipo de Habitación</label>
+                                <label class="label">Fecha de Entrada</label>
+                                <div class="control">
+                                    <input class="input" type="date" name="fecha_entrada" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column is-6">
+                            <div class="field">
+                                <label class="label">Fecha de Salida</label>
+                                <div class="control">
+                                    <input class="input" type="date" name="fecha_salida" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="columns">
+                        <div class="column is-6">
+                            <div class="field">
+                                <label class="label">Habitación Seleccionada</label>
                                 <div class="control select is-fullwidth">
-                                    <select>
-                                        <option>Habitación Sencilla</option>
-                                        <option>Habitación Doble</option>
-                                        <option>Habitación Familiar</option>
-                                        <option>Suite Presidencial</option>
+                                    <select name="habitacion_id" required>
+                                        @foreach($habitaciones as $hab)
+                                            <option value="{{ $hab->id }}">{{ $hab->nombre }} - ${{ number_format($hab->precio, 2) }} / noche</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -253,7 +266,7 @@
                             <div class="field">
                                 <label class="label">Número de Huéspedes</label>
                                 <div class="control">
-                                    <input class="input" type="number" min="1" max="10" value="1" required>
+                                    <input class="input" type="number" min="1" max="10" value="1" name="huespedes" required>
                                 </div>
                             </div>
                         </div>
@@ -262,7 +275,7 @@
                     <div class="field mt-4">
                         <div class="control">
                             <button class="button is-gold is-fullwidth has-text-weight-bold" type="submit">
-                                Consultar Disponibilidad / Reservar
+                                Confirmar y Enviar Reserva
                             </button>
                         </div>
                     </div>
@@ -275,8 +288,8 @@
         <div class="container content has-text-centered">
             <h3 class="title is-4 text-gold mb-3">Hotel Paraíso Real</h3>
             <p class="mb-2"><strong>Teléfono:</strong> +504 9999-1004 | <strong>Correo:</strong> reservas@paraisoreal.example</p>
-            <p class="mb-2"><strong>Dirección:</strong> Av. Principal de la Zona Costera, Honduras</p>
-            <p class="mb-0"><strong>Horario de Recepción:</strong> Atendiendo 24 horas al día, los 7 días de la semana.</p>
+            <p class="mb-2"><strong>Dirección:</strong> Av. Principal de la Zona Hotelera, Honduras</p>
+            <p class="mb-0"><strong>Horario de Recepción:</strong> Atendiendo las 24 horas al día, los 7 días de la semana.</p>
         </div>
     </footer>
 
